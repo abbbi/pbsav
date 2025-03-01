@@ -25,7 +25,7 @@ it does:
  * Install required tools (Debian recommended):
 
  ```
-  apt-get install nbdkit task-spooler \
+  sudo apt-get install nbdkit task-spooler \
     docker-ce docker-ce-cli \
     python3-venv fuse3 git` \
     guestmount
