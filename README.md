@@ -8,8 +8,8 @@ Scan your virtual machine Backups on PBS using clamav.
 
  * It uses nbdkit and the [PBS nbkit plugin](https://github.com/abbbi/cpbsnbd)
    for mapping VM backup disks from an arbitrary PBS datastore via NBD.
- * It uses Docker to run the latest clamav version.
  * It uses `guestmount` to mount the filesystems within the mapped NBD devices.
+ * It uses Docker to run the latest clamav version.
  * Task spooling and reporting is done via `task-spooler`.
  * Scan jobs can be started using the `pbsav` python script.
 
@@ -25,7 +25,10 @@ it does:
  * Install required tools (Debian recommended):
 
  ```
-  apt-get install nbdkit task-spooler docker-ce docker-ce-cli python3-venv fuse3 git`
+  apt-get install nbdkit task-spooler \
+    docker-ce docker-ce-cli \
+    python3-venv fuse3 git` \
+    guestmount
   echo user_allow_other | sudo tee -a /etc/fuse.conf
   git clone https://github.com/abbbi/pbsav
   python3 -m venv pbsavenv
