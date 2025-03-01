@@ -35,7 +35,7 @@ def printVersion(ver) -> None:
     log.info("Version: %s Arguments: %s", ver, " ".join(sys.argv))
 
 
-def configLogger():
+def configLogger(debug):
     """Setup logging"""
     handlers = []
     stderrh = logging.StreamHandler(stream=sys.stderr)
@@ -50,19 +50,24 @@ def configLogger():
             "CRITICAL": "red",
         },
     )
+    level = logging.INFO
+    if debug:
+        level = logging.DEBUG
     stderrh.setFormatter(formatter)
     logging.basicConfig(
         format=logFormat,
         datefmt=logDateFormat,
         handlers=handlers,
-        level=logging.INFO,
+        level=level
     )
 
 
-def get_snapshots(proxmox):
+def get_snapshots(proxmox, datastore):
+    """Select snapshots"""
     snapshots = []
     # Fetch and filter VM snapshots from the datastore "test"
-    for snapshot in proxmox.admin.datastore("test").snapshots.get():
+    for snapshot in proxmox.admin.datastore(datastore).snapshots.get():
+        log.debug(snapshot)
         dt = datetime.fromtimestamp(snapshot["backup-time"], tz=timezone.utc)
         formatted_date = dt.strftime("%Y-%m-%dT%H:%M:%SZ")
 
@@ -160,13 +165,20 @@ def main():
         help="Report mail address",
     )
     opt.add_argument(
-        "-v",
         "--verify-ssl",
         default=False,
         required=False,
         help="Verify SSL connection. Default: %(default)s",
         action="store_true",
     )
+    opt.add_argument(
+        "--debug",
+        default=False,
+        required=False,
+        help="Enable debug log. Default: %(default)s",
+        action="store_true",
+    )
+
 
     argv = parser.parse_args()
     try:
@@ -174,7 +186,7 @@ def main():
     except KeyError:
         pass
 
-    configLogger()
+    configLogger(argv.debug)
     printVersion(version)
 
     plugin = "nbdkit-pbs-plugin.so"
@@ -204,7 +216,7 @@ def main():
         log.error("Unable to setup task spooler: %s", e)
         sys.exit(1)
 
-    snapshots = get_snapshots(proxmox)
+    snapshots = get_snapshots(proxmox, argv.datastore)
     headers = ["Backup ID", "Backup Time (UTC)", "Comment", "Disk images"]
     snapshot_data = []
     for snapshot in snapshots:
