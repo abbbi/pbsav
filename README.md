@@ -40,7 +40,7 @@ it does:
   # copy the nbdkit plugin to the directory
  ```
 
-You may ant to test the full guestfs functionality by running
+You should test the full guestfs functionality by running
 `libguestfs-test-tool` before you continue.
 
 # Marking backups to be scanned
