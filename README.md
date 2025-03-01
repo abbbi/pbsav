@@ -21,7 +21,7 @@ it does:
 # Setup
 
  * You need to compile the [PBS nbkit plugin](https://github.com/abbbi/cpbsnbd)
-   as outlined in the description.
+   as [outlined in the description.](https://github.com/abbbi/cpbsnbd?tab=readme-ov-file#building)
  * Install required tools (Debian recommended):
 
  ```
