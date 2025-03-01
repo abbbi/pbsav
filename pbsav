@@ -55,10 +55,7 @@ def configLogger(debug):
         level = logging.DEBUG
     stderrh.setFormatter(formatter)
     logging.basicConfig(
-        format=logFormat,
-        datefmt=logDateFormat,
-        handlers=handlers,
-        level=level
+        format=logFormat, datefmt=logDateFormat, handlers=handlers, level=level
     )
 
 
@@ -179,7 +176,6 @@ def main():
         action="store_true",
     )
 
-
     argv = parser.parse_args()
     try:
         argv.password = os.environ["PBS_PASSWORD"]
@@ -216,7 +212,11 @@ def main():
         log.error("Unable to setup task spooler: %s", e)
         sys.exit(1)
 
-    snapshots = get_snapshots(proxmox, argv.datastore)
+    try:
+        snapshots = get_snapshots(proxmox, argv.datastore)
+    except proxmoxer.core.ResourceException as e:
+        log.error("Unable to fetch snapshots: [%s]", e)
+        sys.exit(1)
     headers = ["Backup ID", "Backup Time (UTC)", "Comment", "Disk images"]
     snapshot_data = []
     for snapshot in snapshots:
