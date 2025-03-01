@@ -31,6 +31,7 @@ it does:
     guestmount
   echo user_allow_other | sudo tee -a /etc/fuse.conf
   git clone https://github.com/abbbi/pbsav
+  cd pbsav
   python3 -m venv pbsavenv
   source pbsavenv/bin/activate
   pip3 install -r requirements.txt
