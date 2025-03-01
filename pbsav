@@ -28,7 +28,6 @@ logFormatColored = (
 )
 
 logDateFormat = "[%Y-%m-%d %H:%M:%S]"
-defaultCheckpointName = "virtnbdbackup"
 
 
 def printVersion(ver) -> None:
@@ -114,7 +113,7 @@ def main():
         "--user",
         type=str,
         default="root@pam",
-        help="PBS Username %(default)s",
+        help="PBS Username. Default: %(default)s",
     )
     opt.add_argument(
         "-p",
@@ -160,9 +159,20 @@ def main():
         default="",
         help="Report mail address",
     )
+    opt.add_argument(
+        "-v",
+        "--verify-ssl",
+        default=False,
+        required=False,
+        help="Verify SSL connection. Default: %(default)s",
+        action="store_true",
+    )
 
     argv = parser.parse_args()
-    argv.password = os.environ["PBS_PASSWORD"]
+    try:
+        argv.password = os.environ["PBS_PASSWORD"]
+    except KeyError:
+        pass
 
     configLogger()
     printVersion(version)
@@ -178,7 +188,7 @@ def main():
         argv.host,
         user=argv.user,
         password=argv.password,
-        verify_ssl=False,
+        verify_ssl=argv.verify_ssl,
         service="pbs",
     )
 
