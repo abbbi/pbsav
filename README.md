@@ -43,11 +43,11 @@ it does:
 You may ant to test the full guestfs functionality by running
 `libguestfs-test-tool` before you continue.
 
-# Selecting backups for scans
+# Marking backups to be scanned
 
-As there is no functionality to set tags, the current way for selecting backups
-you want to scan is to include an "pbsav" string within the comment of the
-backup description.
+As there is no functionality to set tags, the current way to mark backups you
+want to scan is to include an "pbsav" string within the comment of the backup
+description.
 
 # Starting the scan jobs
 
