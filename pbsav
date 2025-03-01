@@ -191,15 +191,18 @@ def main():
         log.error("nbdkit plugin [%s] required in working directory.", plugin)
         sys.exit(1)
 
-    log.info("connecting PBS")
-    # Connect to Proxmox API
-    proxmox = ProxmoxAPI(
-        argv.host,
-        user=argv.user,
-        password=argv.password,
-        verify_ssl=argv.verify_ssl,
-        service="pbs",
-    )
+    log.info("Connecting PBS: [%s]", argv.host)
+    try:
+        proxmox = ProxmoxAPI(
+            argv.host,
+            user=argv.user,
+            password=argv.password,
+            verify_ssl=argv.verify_ssl,
+            service="pbs",
+        )
+    except Exception as e:
+        log.error("Unable to connect PBS: [%s]", e)
+        sys.exit(1)
 
     log.info("Setting up task spooler with limit: [%s]", argv.joblimit)
     try:
