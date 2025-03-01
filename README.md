@@ -6,7 +6,7 @@ Scan your virtual machine Backups on PBS using clamav.
 
 `pbsav` consists of multiple components:
 
- * It uses nbdkit and the [PBS nbkit plugin](https://github.com/abbbi/cpbsnbd)
+ * It uses nbdkit and the [PBS nbdkit plugin](https://github.com/abbbi/cpbsnbd)
    for mapping VM backup disks from an arbitrary PBS datastore via NBD.
  * It uses `guestmount` to mount the filesystems within the mapped NBD devices.
  * It uses Docker to run the latest clamav version.
@@ -20,7 +20,7 @@ it does:
 
 # Setup
 
- * You need to compile the [PBS nbkit plugin](https://github.com/abbbi/cpbsnbd)
+ * You need to compile the [PBS nbdkit plugin](https://github.com/abbbi/cpbsnbd)
    as [outlined in the description.](https://github.com/abbbi/cpbsnbd?tab=readme-ov-file#building)
  * Install required tools (Debian recommended):
 
