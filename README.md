@@ -54,10 +54,11 @@ description.
 To start the scan jobs you need to pass a few arguments
 
  * The PBS hostname
- * The datastore to query
- * The password (or set PBS_PASSWORD environment variable)
- * The SSL Fingerprint of the PBS server
- * How many simultaneous scan Jobs you want to run
+ * The PBS password (or set PBS_PASSWORD environment variable)
+ * The PBS datastore
+ * The PBS SSL Fingerprint
+ * How many concurrent scan jobs the task spooler starts (set based on your
+   system resources)
  * The mail address to send reports to
 
 Example:
