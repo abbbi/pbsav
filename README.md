@@ -1,6 +1,6 @@
 # pbsav
 
-`Note:` pbs av is WIP and merely a proof of concept.
+`Note:` pbsav is alpha state ;)
 
 Scan your virtual machine Backups on PBS using clamav.
 
