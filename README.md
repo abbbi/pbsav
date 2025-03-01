@@ -97,6 +97,10 @@ ID   State      Output               E-Level  Times(r/u/s)   Command [run=1/1]
 16   finished   /tmp/ts-out.ZG3RI3   0        572.28/25.67/9.63 nbdkit ./nbdkit-pbs-plugin.so image=drive-scsi0.img vmid=103 timestamp=2025-02-25T15:48:38Z repo=root@pam@192.168.161.241:test fingerprint=EE:FF:XX -U - --run /home/abi/pbsav/scan $uri
 ```
 
+Please see the tsp manpage for details on how to manage the queues.
+
+# Reports and logfiles
+
 If the system running the scan jobs has configured proper sendmail connectivity
 (via /usr/sbin/sendmail) reports will be sent via e-mail once an job finished.
 
