@@ -16,7 +16,7 @@ from proxmoxer import ProxmoxAPI
 from proxmoxer.core import ResourceException
 from tabulate import tabulate
 
-version = "0.2"
+version = "0.3"
 
 
 log = logging.getLogger("lib")
