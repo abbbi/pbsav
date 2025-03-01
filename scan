@@ -13,7 +13,7 @@ cleanup() {
 trap cleanup EXIT
 
 qemu-img create -b "$URI" -f qcow2 -F raw "${TMPIMAGE}.qcow2"
-echo "mounted"
 guestmount -o allow_other --format=raw --ro -ia "$TMPIMAGE.qcow2" "$TMPMNT"
+echo "mounted"
 echo "running scan"
 docker run -v /tmp:/tmp clamav/clamav clamscan -ir "$TMPMNT"
