@@ -39,6 +39,9 @@ it does:
   # copy the nbdkit plugin to the directory
  ```
 
+You may ant to test the full guestfs functionality by running
+`libguestfs-test-tool` before you continue.
+
 # Selecting backups for scans
 
 As there is no functionality to set tags, the current way for selecting backups
