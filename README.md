@@ -114,7 +114,28 @@ results/success/ts-out.ZG3RI3
 results/success/ts-out.WzkiLi
 ```
 
+An result logfile looks like:
 
+```
+Start Date: 2025:03:01 16:54:42
+Connecting PBS: [root@pam@192.168.161.241:test] Namespace: []
+Connected via library version: [1.4.1 (UNKNOWN)] Default chunk size: [4194304]
+Opening image [103/2025-02-25T10:32:54Z/drive-scsi0.img.fidx]
+Formatting '/tmp/tmp.YUkVaLazhN.qcow2', fmt=qcow2 cluster_size=65536 extended_l2=off compression_type=zlib size=137438953472 backing_file=nbd+unix://?socket=/tmp/nbdkitnKCEZT/socket backing_fmt=raw lazy_refcounts=off refcount_bits=16
+mounted
+Opening image [103/2025-02-25T10:32:54Z/drive-scsi0.img.fidx]
+running scan
 
-
-
+----------- SCAN SUMMARY -----------
+Known viruses: 8704799
+Engine version: 1.4.2
+Scanned directories: 4445
+Scanned files: 34276
+Infected files: 0
+Data scanned: 2690.73 MB
+Data read: 1822.72 MB (ratio 1.48:1)
+Time: 581.417 sec (9 m 41 s)
+Start Date: 2025:03:01 16:54:42
+End Date:   2025:03:01 17:04:24
+cleanup
+```
