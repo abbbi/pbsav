@@ -4,12 +4,18 @@
 # JOBID="$1"
 ERROR="$2"
 OUTFILE="$3"
-# COMMAND="$4"
+COMMAND="$4"
+#
+#
+VMID=$(echo "$COMMAND" | grep -oP 'vmid=\K\d+')
+TIMESTAMP=$(echo "$COMMAND" | grep -oP 'timestamp=\K[^ ]+')
+IMAGE=$(echo "$COMMAND" | grep -oP 'image=\K[^ ]+')
+FN="${VMID}_${TIMESTAMP}_${IMAGE}.log"
 
 mkdir -p results/{success,failed}
 
 if [ "$ERROR" -ne "0" ]; then
-    cp "$OUTFILE" results/failed/
+    cp "$OUTFILE" "results/failed/$FN"
     exit
 fi
-cp "$OUTFILE" results/success/
+cp "$OUTFILE" "results/success/$FN"

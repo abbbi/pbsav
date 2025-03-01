@@ -120,11 +120,8 @@ the clamav scan output or any other errors that resulted in failure.
 find results/
 results/
 results/failed
-results/failed/ts-out.JsAMyD
 results/success
-results/success/ts-out.8xVjLl
-results/success/ts-out.ZG3RI3
-results/success/ts-out.WzkiLi
+results/success/103_2025-02-25T10:32:54Z_drive-scsi0.img.log
 ```
 
 An result logfile looks like:
