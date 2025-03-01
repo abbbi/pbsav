@@ -1,4 +1,10 @@
 #!/usr/bin/python3
+"""
+pbsav
+Copyright (C) 2025  Michael Ablassmeier <abi@grinser.de>
+"""
+
+
 import os
 import sys
 import subprocess
