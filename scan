@@ -8,6 +8,7 @@ TMPIMAGE=$(mktemp -u)
 cleanup() {
     echo "cleanup"
     umount "$TMPMNT"
+    rm -f "${TMPIMAGE}.qcow2"
 }
 
 trap cleanup EXIT
