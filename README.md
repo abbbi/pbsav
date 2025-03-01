@@ -152,3 +152,8 @@ Start Date: 2025:03:01 16:54:42
 End Date:   2025:03:01 17:04:24
 cleanup
 ```
+
+# TODO's / IDEAS
+
+* Enhance the post-hook script so that it removes the pbsav comment from
+  successfully scanned backups and adds an note about its clean state.
