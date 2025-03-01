@@ -77,11 +77,11 @@ disks included in the snapshot will be scanned.
 ```
 [2025-03-01 18:18:09] INFO lib pbsav - main:  connecting PBS
 [2025-03-01 18:18:09] INFO lib pbsav - main:  Setting up task spooler with limit: [1]
-[2025-03-01 18:18:09] INFO lib pbsav - main:  Considering following backups for scan:
 [2025-03-01 18:18:09] INFO lib pbsav - get_snapshots:  Ignoring snapshot: [123/2025-02-25T10:35:51Z]: no pbsav comment set
 [2025-03-01 18:18:09] INFO lib pbsav - get_snapshots:  Ignoring snapshot: [103/2025-02-25T15:48:38Z]: no pbsav comment set
 [2025-03-01 18:18:09] INFO lib pbsav - get_snapshots:  Ignoring snapshot: [103/2025-02-25T11:06:00Z]: no pbsav comment set
 [2025-03-01 18:18:09] INFO lib pbsav - get_snapshots:  Ignoring snapshot: [120/2025-02-25T15:38:53Z]: no pbsav comment set
+[2025-03-01 18:18:09] INFO lib pbsav - main:  Considering following backups for scan:
 [2025-03-01 18:18:09] INFO lib pbsav - main:
 +-------------+----------------------+-----------------+-----------------+
 |   Backup ID | Backup Time (UTC)    | Comment         | Disk images     |

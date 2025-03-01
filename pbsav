@@ -194,7 +194,6 @@ def main():
         log.error("Unable to setup task spooler: %s", e)
         sys.exit(1)
 
-    log.info("Considering following backups for scan:")
     snapshots = get_snapshots(proxmox)
     headers = ["Backup ID", "Backup Time (UTC)", "Comment", "Disk images"]
     snapshot_data = []
@@ -208,6 +207,7 @@ def main():
             ]
         )
 
+    log.info("Considering following backups for scan:")
     log.info("\n%s", tabulate(snapshot_data, headers=headers, tablefmt="grid"))
 
     os.environ["PBS_PASSWORD"] = argv.password
