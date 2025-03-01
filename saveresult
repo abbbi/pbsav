@@ -1,0 +1,15 @@
+#!/bin/bash
+# script is called by the task spooler to copy
+# the job logfile to the results directory
+# JOBID="$1"
+ERROR="$2"
+OUTFILE="$3"
+# COMMAND="$4"
+
+mkdir -p results/{success,failed}
+
+if [ "$ERROR" -ne "0" ]; then
+    cp "$OUTFILE" results/failed/
+    exit
+fi
+cp "$OUTFILE" results/success/

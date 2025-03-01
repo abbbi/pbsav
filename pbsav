@@ -1,0 +1,246 @@
+#!/usr/bin/python3
+import os
+import sys
+import subprocess
+import argparse
+import logging
+from datetime import datetime, timezone
+import colorlog
+from proxmoxer import ProxmoxAPI
+from tabulate import tabulate
+
+version = "0.1"
+
+
+log = logging.getLogger("lib")
+
+logFormat = "%(asctime)s %(levelname)s %(name)s %(module)s - %(funcName)s: %(message)s"
+logFormatColored = (
+    "%(green)s%(asctime)s%(reset)s%(blue)s %(log_color)s%(levelname)s%(reset)s "
+    "%(name)s %(module)s - %(funcName)s"
+    ": %(log_color)s %(message)s"
+)
+
+logDateFormat = "[%Y-%m-%d %H:%M:%S]"
+defaultCheckpointName = "virtnbdbackup"
+
+
+def printVersion(ver) -> None:
+    """Print version and passed arguments"""
+    log.info("Version: %s Arguments: %s", ver, " ".join(sys.argv))
+
+
+def configLogger():
+    """Setup logging"""
+    handlers = []
+    stderrh = logging.StreamHandler(stream=sys.stderr)
+    handlers.append(stderrh)
+    formatter = colorlog.ColoredFormatter(
+        logFormatColored,
+        datefmt=logDateFormat,
+        log_colors={
+            "WARNING": "yellow",
+            "ERROR": "red",
+            "DEBUG": "cyan",
+            "CRITICAL": "red",
+        },
+    )
+    stderrh.setFormatter(formatter)
+    logging.basicConfig(
+        format=logFormat,
+        datefmt=logDateFormat,
+        handlers=handlers,
+        level=logging.INFO,
+    )
+
+
+def get_snapshots(proxmox):
+    snapshots = []
+    # Fetch and filter VM snapshots from the datastore "test"
+    for snapshot in proxmox.admin.datastore("test").snapshots.get():
+        dt = datetime.fromtimestamp(snapshot["backup-time"], tz=timezone.utc)
+        formatted_date = dt.strftime("%Y-%m-%dT%H:%M:%SZ")
+
+        if snapshot["backup-type"] != "vm":
+            continue
+
+        if not "pbsav" in snapshot["comment"]:
+            log.info(
+                "Ignoring snapshot: [%s/%s]: no pbsav comment set",
+                snapshot["backup-id"],
+                formatted_date,
+            )
+            continue
+
+        disks = []
+        for disk in snapshot["files"]:
+            if not "fidx" in disk["filename"]:
+                continue
+            disks.append(disk["filename"].replace(".fidx", ""))
+
+        snapshot["disks"] = disks
+        snapshot["timestamp"] = formatted_date
+        snapshots.append(snapshot)
+
+    return snapshots
+
+
+def main():
+    try:
+        _ = os.environ["PBS_PASSWORD"]
+        password_required = False
+    except KeyError:
+        password_required = True
+
+    parser = argparse.ArgumentParser(
+        description="pbsav: scan pbs backups using antivir",
+        epilog=(
+            "Examples:\n"
+            "   # start scan jobs for backups:\n"
+            "\t%(prog)s -u root@pam -H pbs -d datastore --fingerprint=XX -j 1\n"
+        ),
+        formatter_class=argparse.RawTextHelpFormatter,
+    )
+
+    opt = parser.add_argument_group("General options")
+    opt.add_argument(
+        "-u",
+        "--user",
+        type=str,
+        default="root@pam",
+        help="PBS Username %(default)s",
+    )
+    opt.add_argument(
+        "-p",
+        "--password",
+        required=password_required,
+        type=str,
+        help="PBS Password (or use PBS_PASSWOD environment variable)",
+    )
+    opt.add_argument(
+        "-H",
+        "--host",
+        required=True,
+        type=str,
+        help="PBS Host",
+    )
+    opt.add_argument(
+        "-d",
+        "--datastore",
+        required=True,
+        type=str,
+        help="PBS datastore",
+    )
+    opt.add_argument(
+        "-f",
+        "--fingerprint",
+        required=True,
+        type=str,
+        help="PBS ssl fingerprint",
+    )
+    opt.add_argument(
+        "-j",
+        "--joblimit",
+        required=False,
+        default=10,
+        type=int,
+        help="Job limit for scan jobs",
+    )
+    opt.add_argument(
+        "-m",
+        "--mailto",
+        required=False,
+        type=str,
+        default="",
+        help="Report mail address",
+    )
+
+    argv = parser.parse_args()
+    argv.password = os.environ["PBS_PASSWORD"]
+
+    configLogger()
+    printVersion(version)
+
+    plugin = "nbdkit-pbs-plugin.so"
+    if not os.path.exists(plugin):
+        log.error("nbdkit plugin [%s] required in working directory.", plugin)
+        sys.exit(1)
+
+    log.info("connecting PBS")
+    # Connect to Proxmox API
+    proxmox = ProxmoxAPI(
+        argv.host,
+        user=argv.user,
+        password=argv.password,
+        verify_ssl=False,
+        service="pbs",
+    )
+
+    log.info("Setting up task spooler with limit: [%s]", argv.joblimit)
+    try:
+        env = os.environ
+        env["TS_SAVELIST"] = f"{os.getcwd()}/joblist.tsp"
+        env["TS_ONFINISH"] = f"{os.getcwd()}/saveresult"
+        if argv.mailto != "":
+            env["TS_MAILTO"] = argv.mailto
+        subprocess.run(f"tsp -S {argv.joblimit}", shell=True, check=True, env=env)
+    except subprocess.CalledProcessError as e:
+        log.error("Unable to setup task spooler: %s", e)
+        sys.exit(1)
+
+    log.info("Considering following backups for scan:")
+    snapshots = get_snapshots(proxmox)
+    headers = ["Backup ID", "Backup Time (UTC)", "Comment", "Disk images"]
+    snapshot_data = []
+    for snapshot in snapshots:
+        snapshot_data.append(
+            [
+                snapshot["backup-id"],
+                snapshot["timestamp"],
+                snapshot["comment"],
+                ",".join(snapshot["disks"]),
+            ]
+        )
+
+    log.info("\n%s", tabulate(snapshot_data, headers=headers, tablefmt="grid"))
+
+    os.environ["PBS_PASSWORD"] = argv.password
+    env = os.environ
+    if argv.mailto != "":
+        env["TS_MAILTO"] = argv.mailto
+    for snapshot in snapshots:
+        for disk in snapshot["disks"]:
+            cmd = []
+            cmd.append("tsp")
+            cmd.append("nbdkit")
+            cmd.append(f"./{plugin}")
+            cmd.append(f"image={disk}")
+            cmd.append(f"vmid={snapshot['backup-id']}")
+            cmd.append(f"timestamp={snapshot['timestamp']}")
+            cmd.append(f"repo={argv.user}@{argv.host}:{argv.datastore}")
+            cmd.append(f"fingerprint={argv.fingerprint}")
+            cmd.append("-U")
+            cmd.append("-")
+            cmd.append("--run")
+            cmd.append(f"'{os.getcwd()}/scan $uri'")
+
+            try:
+                subprocess.run(
+                    " ".join(cmd),
+                    shell=True,
+                    capture_output=True,
+                    text=True,
+                    check=True,
+                    env=env,
+                )
+                log.info(
+                    "Job for snapshot [%s] disk [%s] submitted.",
+                    snapshot["timestamp"],
+                    disk,
+                )
+            except subprocess.CalledProcessError as e:
+                log.error("Failed to submit: %s", e)
+
+
+if __name__ == "__main__":
+    main()

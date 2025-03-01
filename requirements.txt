@@ -1,0 +1,4 @@
+tabulate
+proxmoxer
+requests
+colorlog
