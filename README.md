@@ -93,7 +93,7 @@ disks included in the snapshot will be scanned.
 
 # Monitoring the scans
 
-The scanjobs are enqueued using the tasks-pooler system. You can get a list of
+The scanjobs are enqueued using the `task-spooler` system. You can get a list of
 running scans and their state using the `tsp` command, like so:
 
 ```
