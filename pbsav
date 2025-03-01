@@ -13,6 +13,7 @@ import logging
 from datetime import datetime, timezone
 import colorlog
 from proxmoxer import ProxmoxAPI
+from proxmoxer.core import ResourceException
 from tabulate import tabulate
 
 version = "0.1"
@@ -214,7 +215,7 @@ def main():
 
     try:
         snapshots = get_snapshots(proxmox, argv.datastore)
-    except proxmoxer.core.ResourceException as e:
+    except ResourceException as e:
         log.error("Unable to fetch snapshots: [%s]", e)
         sys.exit(1)
     headers = ["Backup ID", "Backup Time (UTC)", "Comment", "Disk images"]
