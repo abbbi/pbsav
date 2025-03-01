@@ -105,6 +105,8 @@ ID   State      Output               E-Level  Times(r/u/s)   Command [run=1/1]
 ```
 
 Please see the tsp manpage for details on how to manage the queues.
+There is also a [web version](https://github.com/BrunnerLivio/tsp-web/) for
+monitoring tsp jobs via webfrontend.
 
 # Reports and logfiles
 
