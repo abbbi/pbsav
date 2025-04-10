@@ -16,7 +16,7 @@ from proxmoxer import ProxmoxAPI
 from proxmoxer.core import ResourceException
 from tabulate import tabulate
 
-version = "0.2"
+version = "0.3"
 
 
 log = logging.getLogger("lib")
@@ -140,6 +140,14 @@ def main():
         help="PBS datastore",
     )
     opt.add_argument(
+        "-n",
+        "--namespace",
+        required=False,
+        type=str,
+        default="",
+        help="PBS namespace",
+    )
+    opt.add_argument(
         "-f",
         "--fingerprint",
         required=True,
@@ -250,6 +258,8 @@ def main():
             cmd.append(f"vmid={snapshot['backup-id']}")
             cmd.append(f"timestamp={snapshot['timestamp']}")
             cmd.append(f"repo={argv.user}@{argv.host}:{argv.datastore}")
+            if argv.namespace != "":
+                cmd.append(f"namespace={argv.namespace}")
             cmd.append(f"fingerprint={argv.fingerprint}")
             cmd.append("-U")
             cmd.append("-")
